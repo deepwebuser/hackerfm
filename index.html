@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HACKER FM - NOTFALSE</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: black;
+            color: #00FF00;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                45deg,
+                rgba(0,255,0,0.05),
+                rgba(0,255,0,0.05) 10px,
+                transparent 10px,
+                transparent 20px
+            );
+            animation: scan 5s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes scan {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100%; }
+        }
+
+        .radio-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid #00FF00;
+            box-shadow: 0 0 20px #00FF00;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            cursor: move;
+            z-index: 1;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.02); }
+        }
+
+        .logo {
+            font-size: 2em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px #00FF00;
+        }
+
+        .tagline {
+            font-size: 0.9em;
+            color: #00AA00;
+            margin-bottom: 20px;
+            text-shadow: 0 0 3px #00AA00;
+        }
+
+        .status-bar {
+            width: 100%;
+            height: 5px;
+            background: #00FF00;
+            position: relative;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+
+        .status-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 10%;
+            background: linear-gradient(to right, transparent, #000, transparent);
+            animation: scanline 1s linear infinite;
+        }
+
+        @keyframes scanline {
+            0% { left: -10%; }
+            100% { left: 110%; }
+        }
+
+        .track-info {
+            font-size: 1.1em;
+            margin: 10px 0;
+            text-shadow: 0 0 5px #00FF00;
+        }
+
+        button {
+            background: #000;
+            color: #00FF00;
+            border: 2px solid #00FF00;
+            padding: 12px 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            font-weight: bold;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(120deg, transparent, #00FF00, transparent);
+            transition: left 0.5s;
+        }
+
+        button:hover::after {
+            left: 100%;
+        }
+
+        button:hover {
+            background: #00FF00;
+            color: #000;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.8em;
+            color: #00AA00;
+            text-shadow: 0 0 3px #00AA00;
+        }
+    </style>
+</head>
+<body>
+    <div class="radio-container" id="radio-window">
+        <div class="logo">HACKER FM</div>
+        <div class="tagline">powered by NOTFALSE</div>
+        <div class="status-bar"></div>
+        <div class="track-info">ON AIR</div>
+        <button id="play-btn">▶ START BROADCAST</button>
+        <audio id="audio" src="intro1.mp3"></audio>
+    </div>
+
+    <div class="footer">
+        <a href="https://notfalse.pages.dev"  target="_blank" style="color: #00AA00; text-decoration: none;">Web-Site</a>
+    </div>
+
+    <script>
+        const radioWindow = document.getElementById('radio-window');
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        radioWindow.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            offsetX = e.clientX - radioWindow.offsetLeft;
+            offsetY = e.clientY - radioWindow.offsetTop;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                radioWindow.style.left = `${e.clientX - offsetX}px`;
+                radioWindow.style.top = `${e.clientY - offsetY}px`;
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        const audio = document.getElementById('audio');
+        const playBtn = document.getElementById('play-btn');
+        const trackInfo = document.querySelector('.track-info');
+
+        const intros = ["intro1.mp3", "intro2.mp3"];
+        let playedTracks = [];
+        let introCounter = 0;
+
+        function random(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        let tracks = [];
+
+        fetch('tracks.json')
+            .then(res => res.json())
+            .then(data => {
+                tracks = data.tracks;
+            });
+
+        function getRandomTrack() {
+            if (playedTracks.length >= tracks.length * 2) {
+                playedTracks = [];
+            }
+
+            let randomIndex;
+            do {
+                randomIndex = Math.floor(Math.random() * tracks.length);
+            } while (
+                playedTracks.slice(-2).includes(randomIndex) ||
+                playedTracks.slice(-tracks.length).filter(i => i === randomIndex).length > 1
+            );
+
+            playedTracks.push(randomIndex);
+            return tracks[randomIndex];
+        }
+
+        function playTrack(url, isIntro = false) {
+            audio.src = url;
+            if (isIntro) {
+                trackInfo.textContent = `ON AIR: HACKER FM`;
+            } else {
+                const fileName = url.split('/').pop().replace('.mp3', '');
+                trackInfo.textContent = `ON AIR: ${fileName.toUpperCase()}`;
+            }
+            
+            audio.play().then(() => {
+                if (!isIntro) {
+                    const duration = audio.duration;
+                    const randomStart = Math.min(10, duration * 0.5);
+                    audio.currentTime = Math.random() * randomStart;
+                }
+            });
+        }
+
+        playBtn.addEventListener('click', () => {
+            playTrack(audio.src, true);
+            playBtn.disabled = true;
+            playBtn.textContent = '▶ BROADCASTING...';
+        });
+
+        audio.addEventListener('ended', () => {
+            introCounter++;
+
+            if (introCounter >= random(5, 8)) {
+                introCounter = 0;
+                const intro = intros[Math.floor(Math.random() * intros.length)];
+                playTrack(intro, true);
+            } else {
+                if (tracks.length > 0) {
+                    playTrack(getRandomTrack());
+                }
+            }
+        });
+    </script>
+</body>
+</html>
