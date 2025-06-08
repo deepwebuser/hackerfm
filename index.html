@@ -167,22 +167,21 @@
         const playBtn = document.getElementById('play-btn');
         const trackInfo = document.querySelector('.track-info');
 
-        // Список треков (обновите вручную при добавлении новых файлов!)
+        // === Список треков (все в папке music/) ===
         const tracks = [
             "music/Mr Robot Main Theme Fixed and Extended.mp3",
             "music/Falling Down.mp3",
-            "Life Force.mp3",
-            "Shadow Lady.mp3",
-            "Suffer With Me.mp3",
-            "Sweet Dreams.mp3",
-            "Whoami OST.mp3"
+            "music/Life Force.mp3",
+            "music/Shadow Lady.mp3",
+            "music/Suffer With Me.mp3",
+            "music/Sweet Dreams.mp3",
+            "music/Whoami OST.mp3"
         ];
 
-        const intro = "intro.mp3"; // Единственное интро
+        const intro = "music/intro.mp3"; // Интро также в папке music/
 
         let playedTracks = []; // История воспроизведенных треков
         let introCounter = 0;  // Счётчик до следующего интро
-        let currentTrackIndex = 0;
 
         // === Получение случайного трека ===
         function getRandomTrack() {
@@ -214,7 +213,7 @@
             
             audio.play().catch(err => {
                 console.error("Ошибка воспроизведения:", err);
-                trackInfo.textContent = "❌ Error: It is impossible to download the track";
+                trackInfo.textContent = "❌ ОШИБКА: НЕВОЗМОЖНО ЗАГРУЗИТЬ ТРЕК";
                 playBtn.disabled = false;
                 playBtn.textContent = "▶ RESTART BROADCAST";
             });
@@ -245,7 +244,7 @@
 
         // === Обработка ошибок аудио ===
         audio.addEventListener('error', () => {
-            trackInfo.textContent = "❌ Error: it is impossible to reproduce the track";
+            trackInfo.textContent = "❌ ОШИБКА: НЕВОЗМОЖНО ВОСПРОИЗВЕСТИ ТРЕК";
             playBtn.disabled = false;
             playBtn.textContent = "▶ RESTART BROADCAST";
         });
