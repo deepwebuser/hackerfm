@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>HACKER FM - NOTFALSE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <style>
         /* === Базовые стили === */
         body {
@@ -17,6 +18,41 @@
             height: 100vh;
             overflow: hidden;
             position: relative;
+        }
+
+        /* === Мета-стили для мобильных === */
+        @media (max-width: 768px) {
+            body {
+                height: 100%;
+                padding: 20px;
+            }
+            
+            .radio-container {
+                width: 90%;
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .track-marquee {
+                font-size: 0.9em;
+                padding: 4px 0;
+            }
+            
+            button {
+                padding: 15px 25px;
+                font-size: 1.1em;
+            }
+            
+            .volume-control {
+                margin-top: 15px;
+            }
+            
+            .footer {
+                font-size: 0.7em;
+            }
         }
 
         /* === Анимированный фон с битами === */
@@ -50,6 +86,7 @@
             padding: 30px;
             z-index: 1;
             text-align: center;
+            max-width: 500px;
         }
 
         h1 {
@@ -74,6 +111,7 @@
             border: 1px solid #00FF00;
             padding: 5px 0;
             margin: 10px 0;
+            font-size: 1em;
         }
 
         .track-marquee span {
@@ -136,13 +174,14 @@
             background: #000;
             color: #00FF00;
             border: 2px solid #00FF00;
-            padding: 12px 25px;
+            padding: 15px 25px;
             cursor: pointer;
             font-size: 1em;
             transition: all 0.3s;
             font-weight: bold;
             position: relative;
             overflow: hidden;
+            margin: 10px 0;
         }
 
         button::after {
@@ -189,11 +228,11 @@
         }
 
         .volume-slider {
-            width: 100px;
+            width: 120px;
             appearance: none;
             background: #00FF00;
-            height: 4px;
-            border-radius: 2px;
+            height: 6px;
+            border-radius: 3px;
             outline: none;
             position: relative;
         }
@@ -216,8 +255,8 @@
 
         .volume-slider::-webkit-slider-thumb {
             appearance: none;
-            width: 12px;
-            height: 12px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
             background: #000;
             border: 2px solid #00FF00;
@@ -279,7 +318,7 @@
             "music/Suffer With Me.mp3",
             "music/Sweet Dreams.mp3",
             "music/Whoami OST.mp3",
-            "music/We Are All Illuminati.mp3" 
+            "music/We Are All Illuminati.mp3"
         ];
 
         const intro = "music/intro.mp3"; // Интро в папке music/
@@ -316,8 +355,8 @@
             }
             
             audio.play().catch(err => {
-                console.error("Ошибка воспроизведения:", err);
-                trackName.textContent = "❌ ОШИБКА: НЕВОЗМОЖНО ЗАГРУЗИТЬ ТРЕК";
+                console.error("Playback error:", err);
+                trackName.textContent = "❌ ERROR: FAILED TO LOAD TRACK";
                 playBtn.disabled = false;
                 playBtn.textContent = "▶ RESTART BROADCAST";
             });
@@ -348,7 +387,7 @@
 
         // === Обработка ошибок аудио ===
         audio.addEventListener('error', () => {
-            trackName.textContent = "❌ ОШИБКА: НЕВОЗМОЖНО ВОСПРОИЗВЕСТИ ТРЕК";
+            trackName.textContent = "❌ ERROR: FAILED TO PLAY TRACK";
             playBtn.disabled = false;
             playBtn.textContent = "▶ RESTART BROADCAST";
         });
