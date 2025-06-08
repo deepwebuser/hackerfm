@@ -4,15 +4,22 @@
     <meta charset="UTF-8">
     <title>HACKER FM - NOTFALSE</title>
     <style>
+        /* === Базовые стили === */
         body {
             margin: 0;
             padding: 0;
             background: black;
             color: #00FF00;
             font-family: 'Courier New', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             overflow: hidden;
+            position: relative;
         }
 
+        /* === Анимированный фон === */
         body::before {
             content: '';
             position: absolute;
@@ -34,29 +41,20 @@
             100% { background-position: 0 100%; }
         }
 
+        /* === Основной контейнер === */
         .radio-container {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
             background: rgba(0, 0, 0, 0.95);
             border: 2px solid #00FF00;
             box-shadow: 0 0 20px #00FF00;
             border-radius: 10px;
             padding: 30px;
-            text-align: center;
-            cursor: move;
             z-index: 1;
-            animation: float 3s ease-in-out infinite;
+            text-align: center;
+            animation: glitch 1s infinite;
         }
 
-        @keyframes float {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); }
-            50% { transform: translate(-50%, -50%) scale(1.02); }
-        }
-
-        .logo {
-            font-size: 2em;
+        h1 {
+            font-size: 2.5em;
             margin-bottom: 10px;
             text-shadow: 0 0 5px #00FF00;
         }
@@ -66,6 +64,12 @@
             color: #00AA00;
             margin-bottom: 20px;
             text-shadow: 0 0 3px #00AA00;
+        }
+
+        .track-info {
+            font-size: 1.2em;
+            margin: 20px 0;
+            text-shadow: 0 0 5px #00FF00;
         }
 
         .status-bar {
@@ -80,10 +84,9 @@
         .status-bar::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
+            top: 0; left: -100%;
+            width: 100%;
             height: 100%;
-            width: 10%;
             background: linear-gradient(to right, transparent, #000, transparent);
             animation: scanline 1s linear infinite;
         }
@@ -91,12 +94,6 @@
         @keyframes scanline {
             0% { left: -10%; }
             100% { left: 110%; }
-        }
-
-        .track-info {
-            font-size: 1.1em;
-            margin: 10px 0;
-            text-shadow: 0 0 5px #00FF00;
         }
 
         button {
@@ -140,64 +137,52 @@
             color: #00AA00;
             text-shadow: 0 0 3px #00AA00;
         }
+
+        /* === Глитч-эффект === */
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            25% { transform: translate(-5px, -5px); }
+            50% { transform: translate(5px, 5px); }
+            75% { transform: translate(-5px, 5px); }
+            100% { transform: translate(0); }
+        }
     </style>
 </head>
 <body>
-    <div class="radio-container" id="radio-window">
-        <div class="logo">HACKER FM</div>
+    <div class="radio-container">
+        <h1>HACKER FM</h1>
         <div class="tagline">powered by NOTFALSE</div>
         <div class="status-bar"></div>
         <div class="track-info">ON AIR</div>
         <button id="play-btn">▶ START BROADCAST</button>
-        <audio id="audio" src="intro1.mp3"></audio>
+        <audio id="audio"></audio>
     </div>
 
     <div class="footer">
-        <a href="https://notfalse.pages.dev"  target="_blank" style="color: #00AA00; text-decoration: none;">Web-Site</a>
+        <a href="https://notfalse.pages.dev"  target="_blank" style="color: #00AA00; text-decoration: none;">notfalse.pages.dev</a>
     </div>
 
     <script>
-        const radioWindow = document.getElementById('radio-window');
-        let isDragging = false;
-        let offsetX, offsetY;
-
-        radioWindow.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            offsetX = e.clientX - radioWindow.offsetLeft;
-            offsetY = e.clientY - radioWindow.offsetTop;
-        });
-
-        window.addEventListener('mousemove', (e) => {
-            if (isDragging) {
-                radioWindow.style.left = `${e.clientX - offsetX}px`;
-                radioWindow.style.top = `${e.clientY - offsetY}px`;
-            }
-        });
-
-        window.addEventListener('mouseup', () => {
-            isDragging = false;
-        });
-
         const audio = document.getElementById('audio');
         const playBtn = document.getElementById('play-btn');
         const trackInfo = document.querySelector('.track-info');
 
-        const intros = ["intro1.mp3", "intro2.mp3"];
-        let playedTracks = [];
-        let introCounter = 0;
+        // === Список треков (обновляется вручную) ===
+        const tracks = [
+            "music/"
+        ];
 
+        const intro = "intro.mp3"; // Единственное интро
+
+        let playedTracks = []; // История воспроизведенных треков
+        let introCounter = 0;  // Счётчик до следующего интро
+
+        // === Генерация случайного числа ===
         function random(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         }
 
-        let tracks = [];
-
-        fetch('tracks.json')
-            .then(res => res.json())
-            .then(data => {
-                tracks = data.tracks;
-            });
-
+        // === Получение случайного трека ===
         function getRandomTrack() {
             if (playedTracks.length >= tracks.length * 2) {
                 playedTracks = [];
@@ -215,6 +200,7 @@
             return tracks[randomIndex];
         }
 
+        // === Воспроизведение трека ===
         function playTrack(url, isIntro = false) {
             audio.src = url;
             if (isIntro) {
@@ -227,29 +213,29 @@
             audio.play().then(() => {
                 if (!isIntro) {
                     const duration = audio.duration;
-                    const randomStart = Math.min(10, duration * 0.5);
+                    const randomStart = Math.min(10, duration * 0.5); // Не более 50% длины
                     audio.currentTime = Math.random() * randomStart;
                 }
             });
         }
 
+        // === Логика запуска ===
         playBtn.addEventListener('click', () => {
-            playTrack(audio.src, true);
+            const firstTrack = getRandomTrack();
+            playTrack(firstTrack); // Первый трек — случайный
             playBtn.disabled = true;
             playBtn.textContent = '▶ BROADCASTING...';
         });
 
+        // === Событие окончания трека ===
         audio.addEventListener('ended', () => {
             introCounter++;
 
             if (introCounter >= random(5, 8)) {
                 introCounter = 0;
-                const intro = intros[Math.floor(Math.random() * intros.length)];
                 playTrack(intro, true);
             } else {
-                if (tracks.length > 0) {
-                    playTrack(getRandomTrack());
-                }
+                playTrack(getRandomTrack());
             }
         });
     </script>
