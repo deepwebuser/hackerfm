@@ -50,7 +50,6 @@
             padding: 30px;
             z-index: 1;
             text-align: center;
-            animation: glitch 1s infinite;
         }
 
         h1 {
@@ -66,10 +65,26 @@
             text-shadow: 0 0 3px #00AA00;
         }
 
-        .track-info {
-            font-size: 1.2em;
-            margin: 20px 0;
-            text-shadow: 0 0 5px #00FF00;
+        /* === Бегущая строка с названием трека === */
+        .track-marquee {
+            width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            box-sizing: border-box;
+            border: 1px solid #00FF00;
+            padding: 5px 0;
+            margin: 10px 0;
+        }
+
+        .track-marquee span {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 10s linear infinite;
+        }
+
+        @keyframes marquee {
+            from { transform: translateX(0); }
+            to { transform: translateX(-100%); }
         }
 
         /* === Визуализатор звука === */
@@ -92,6 +107,7 @@
             100% { transform: scaleY(2); opacity: 1; }
         }
 
+        /* === Статус-бар с анимацией === */
         .status-bar {
             width: 100%;
             height: 5px;
@@ -158,21 +174,13 @@
             text-shadow: 0 0 3px #00AA00;
         }
 
-        /* === Глитч-эффект === */
-        @keyframes glitch {
-            0% { transform: translate(0); }
-            25% { transform: translate(-5px, -5px); }
-            50% { transform: translate(5px, 5px); }
-            75% { transform: translate(-5px, 5px); }
-            100% { transform: translate(0); }
-        }
-
         /* === Регулятор громкости === */
         .volume-control {
             display: flex;
             align-items: center;
             gap: 10px;
             margin-top: 20px;
+            justify-content: center;
         }
 
         .volume-label {
@@ -187,6 +195,23 @@
             height: 4px;
             border-radius: 2px;
             outline: none;
+            position: relative;
+        }
+
+        .volume-slider::after {
+            content: '';
+            position: absolute;
+            top: -5px; left: 0;
+            height: 14px;
+            width: 100%;
+            background: linear-gradient(to right, transparent, #00FF00, transparent);
+            opacity: 0.5;
+            animation: glow 2s infinite;
+        }
+
+        @keyframes glow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
         }
 
         .volume-slider::-webkit-slider-thumb {
@@ -205,7 +230,7 @@
         <h1>HACKER FM</h1>
         <div class="tagline">powered by NOTFALSE</div>
         <div class="status-bar"></div>
-        <div class="track-info">ON AIR</div>
+        <div class="track-marquee"><span id="track-name">ON AIR: HACKER FM</span></div>
 
         <!-- Визуализатор звука -->
         <div class="visualizer">
@@ -234,7 +259,7 @@
     <script>
         const audio = document.getElementById('audio');
         const playBtn = document.getElementById('play-btn');
-        const trackInfo = document.querySelector('.track-info');
+        const trackName = document.getElementById('track-name');
         const volumeSlider = document.getElementById('volume-slider');
 
         // Установка начальной громкости
@@ -283,15 +308,15 @@
         function playTrack(url, isIntro = false) {
             audio.src = url;
             if (isIntro) {
-                trackInfo.textContent = `ON AIR: HACKER FM`;
+                trackName.textContent = `ON AIR: HACKER FM`;
             } else {
                 const fileName = url.split('/').pop().replace('.mp3', '');
-                trackInfo.textContent = `ON AIR: ${fileName.toUpperCase()}`;
+                trackName.textContent = `ON AIR: ${fileName.toUpperCase()}`;
             }
             
             audio.play().catch(err => {
                 console.error("Ошибка воспроизведения:", err);
-                trackInfo.textContent = "❌ ОШИБКА: НЕВОЗМОЖНО ЗАГРУЗИТЬ ТРЕК";
+                trackName.textContent = "❌ ОШИБКА: НЕВОЗМОЖНО ЗАГРУЗИТЬ ТРЕК";
                 playBtn.disabled = false;
                 playBtn.textContent = "▶ RESTART BROADCAST";
             });
@@ -322,7 +347,7 @@
 
         // === Обработка ошибок аудио ===
         audio.addEventListener('error', () => {
-            trackInfo.textContent = "❌ ОШИБКА: НЕВОЗМОЖНО ВОСПРОИЗВЕСТИ ТРЕК";
+            trackName.textContent = "❌ ОШИБКА: НЕВОЗМОЖНО ВОСПРОИЗВЕСТИ ТРЕК";
             playBtn.disabled = false;
             playBtn.textContent = "▶ RESTART BROADCAST";
         });
