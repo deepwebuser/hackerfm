@@ -11,7 +11,6 @@ A **cyberpunk-themed hacker radio** that plays random tracks with occasional int
 - 📱 **Fully responsive mobile design**  
 - 🔊 **Volume control with glowing animation**  
 - 📡 **Dynamic visualizer & marquee display**  
-- 🧩 **Hidden Easter egg for observant users**
 
 ---
 
