@@ -267,7 +267,7 @@
 <body>
     <div class="radio-container">
         <h1>HACKER FM</h1>
-        <div class="tagline">powered by 14 15 19 6 1 12 19 5</div>
+        <div class="tagline">powered by you.</div> <!-- n -->
         <div class="status-bar"></div>
         <div class="track-marquee"><span id="track-name">ON AIR: HACKER FM</span></div>
 
@@ -277,7 +277,7 @@
             <div class="bar"></div>
             <div class="bar"></div>
             <div class="bar"></div>
-            <div class="bar"></div>
+            <div class="bar"></div> <!-- ot -->
         </div>
 
         <button id="play-btn">▶ START BROADCAST</button>
@@ -292,12 +292,12 @@
     </div>
 
     <div class="footer">
-        <a href="http://shortlink.is/AWDO4K"  target="_blank" style="color: #00AA00; text-decoration: none;">Source Code</a>
+        <a href="http://shortlink.is/AWDO4K"  target="_blank" style="color: #00AA00; text-decoration: none;">Source Code</a> <!-- fal -->
     </div>
 
     <script>
         const audio = document.getElementById('audio');
-        const playBtn = document.getElementById('play-btn');
+        const playBtn = document.getElementById('play-btn'); 
         const trackName = document.getElementById('track-name');
         const volumeSlider = document.getElementById('volume-slider');
 
@@ -341,7 +341,7 @@
             );
 
             playedTracks.push(randomIndex);
-            return tracks[randomIndex];
+            return tracks[randomIndex]; // === se.pa ===
         }
 
         // === Running track ===
@@ -356,7 +356,7 @@
             
             audio.play().catch(err => {
                 console.error("Playback error:", err);
-                trackName.textContent = "❌ ERROR: FAILED TO LOAD TRACK";
+                trackName.textContent = "❌ ERROR: FAILED TO LOAD TRACK"; // === ges.d ===
                 playBtn.disabled = false;
                 playBtn.textContent = "▶ RESTART BROADCAST";
             });
@@ -365,7 +365,7 @@
         // === Start logic ===
         playBtn.addEventListener('click', () => {
             playBtn.disabled = true;
-            playBtn.textContent = "▶ BROADCASTING...";
+            playBtn.textContent = "▶ BROADCASTING..."; // === ev ===
 
             // The first track is random
             const firstTrack = getRandomTrack();
